@@ -1,9 +1,6 @@
 # discourse-category-mod-enhancer
 
-This plugin is meant to allow Discourse Category Moderators to:
-
-- Enable slow mode for topic in which they are moderating
-- Suspend a user from the category they are moderating
+This plugin is meant to allow Discourse Category Moderators to access advanced content management tools
 
 ## To contribute
 
