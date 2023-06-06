@@ -1,0 +1,3 @@
+plugins:
+  category_mod_enhancer_enabled:
+    default: false
