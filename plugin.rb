@@ -6,8 +6,57 @@
 
 enabled_site_setting :category_mod_enhancer_enabled
 
+module ::MyPluginModule
+    PLUGIN_NAME = "discourse-category-mod-enhancer-v2"
+end
+
+require_relative "lib/my_plugin_module/engine"
+
 after_initialize do
-    # TODO: register our version of guardian.rb and replace the function `is_staff` with our logic
-    # TODO: register our version of the controllers that invoke the guardian for is_staff and include the `(category)`
-    # TODO: exclude our version of the `is_staff` from the checks for accessing user's details or taking actions on users
+    # category moderators can moderate topics in their category
+    add_to_class(:guardian, :can_moderate?) do |obj|
+        obj && authenticated? && !is_silenced? &&
+          (
+            is_staff? ||
+              (obj.is_a?(Topic) && (@user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(obj) ) && can_see_topic?(obj))
+
+          )
+    end
+    class ::TopicsController < ApplicationController
+        def reset_bump_date
+            params.require(:id)
+            topic = Topic.find_by(id: params[:id])
+
+            guardian.can_moderate?(topic)
+
+            raise Discourse::NotFound.new unless topic
+
+            topic.reset_bumped_at
+            render body: nil
+        end
+
+        def change_timestamps
+            topic_id = params.require(:topic_id).to_i
+            timestamp = params.require(:timestamp).to_f
+            topic = Topic.with_deleted.find(topic_id)
+
+            guardian.can_moderate?(topic)
+
+            previous_timestamp = topic.first_post.created_at
+
+            begin
+                TopicTimestampChanger.new(topic: topic, timestamp: timestamp).change!
+
+                StaffActionLogger.new(current_user).log_topic_timestamps_changed(
+                  topic,
+                  Time.zone.at(timestamp),
+                  previous_timestamp,
+                  )
+
+                render json: success_json
+            rescue ActiveRecord::RecordInvalid, TopicTimestampChanger::InvalidTimestampError
+                render json: failed_json, status: 422
+            end
+        end
+    end
 end
