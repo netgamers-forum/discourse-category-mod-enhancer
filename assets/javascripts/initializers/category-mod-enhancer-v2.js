@@ -53,6 +53,14 @@ export default {
                 button_group: "time",
               })
             }
+            if (!decorator.attrs.actionButtons.find((b) => b.url === `/review?topic_id=${topic.id}&status=all`)) {
+              decorator.attrs.actionButtons.push({
+                icon: "list",
+                buttonClass: "popup-menu-btn",
+                fullLabel: "review.moderation_history",
+                url: `/review?topic_id=${topic.id}&status=all`,
+              })
+            }
           }
         })
       }
