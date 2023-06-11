@@ -22,6 +22,27 @@ after_initialize do
 
           )
     end
+
+    add_to_class(:post_guardian, :can_lock_post?) do |post|
+        can_see_post?(post) && (is_staff? || (post.topic && can_moderate?(post.topic)))
+    end
+
+    add_to_class(:post_guardian, :can_rebake?) do |post|
+        is_staff? || @user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(post.topic)
+    end
+
+    add_to_class(:post_guardian, :can_wiki?) do |post|
+        return false unless authenticated?
+        return true if is_staff? || @user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(post.topic)
+
+        if @user.has_trust_level?(SiteSetting.min_trust_to_allow_self_wiki) && is_my_own?(post)
+            return false if post.hidden?
+            return !post.edit_time_limit_expired?(@user)
+        end
+
+        false
+    end
+
     class ::TopicsController < ApplicationController
         def reset_bump_date
             params.require(:id)
@@ -57,6 +78,19 @@ after_initialize do
             rescue ActiveRecord::RecordInvalid, TopicTimestampChanger::InvalidTimestampError
                 render json: failed_json, status: 422
             end
+        end
+    end
+
+    class ::PostsController < ApplicationController
+        def post_type
+            post = find_post_from_params
+            guardian.can_moderate?(post.topic)
+            params.require(:post_type)
+            raise Discourse::InvalidParameters.new(:post_type) if Post.types[params[:post_type].to_i].blank?
+
+            post.revise(current_user, post_type: params[:post_type].to_i)
+
+            render body: nil
         end
     end
 end
