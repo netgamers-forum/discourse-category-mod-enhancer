@@ -11,6 +11,4 @@ This plugin is meant to allow Discourse Category Moderators to access advanced c
 - ???
 - Profit
 
-## Third party
 
-- https://github.com/discourse/discourse-groups-css-classes-in-body
