@@ -1,10 +1,13 @@
-# name: discourse-category-mod-enhancer
-# about: Discourse Category Mod Enhancer
-# version: 1.0
-# authors: Crius, Char, Drest, ilNibbio
-# url: https://github.com/netgamers-forum/discourse-category-mod-enhancer
+# frozen_string_literal: true
 
-enabled_site_setting :category_mod_enhancer_enabled
+# name: discourse-category-mod-enhancer-v2
+# about: TODO
+# version: 0.0.1
+# authors: Daniele Mancini
+# url: TODO
+# required_version: 2.7.0
+
+enabled_site_setting :plugin_name_enabled
 
 module ::MyPluginModule
     PLUGIN_NAME = "discourse-category-mod-enhancer-v2"
@@ -18,7 +21,7 @@ after_initialize do
         obj && authenticated? && !is_silenced? &&
           (
             is_staff? ||
-              (obj.is_a?(Topic) && (@user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(obj) ) && can_see_topic?(obj))
+              (obj.is_a?(Topic) && (@user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(obj)) && can_see_topic?(obj))
 
           )
     end
@@ -28,6 +31,7 @@ after_initialize do
     end
 
     add_to_class(:post_guardian, :can_rebake?) do |post|
+        return false unless authenticated?
         is_staff? || @user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(post.topic)
     end
 
