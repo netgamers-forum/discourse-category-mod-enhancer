@@ -1,13 +1,10 @@
-# frozen_string_literal: true
-
 # name: discourse-category-mod-enhancer
-# about: TODO
-# version: 0.0.1
-# authors: Daniele Mancini
-# url: TODO
-# required_version: 2.7.0
+# about: Discourse Category Mod Enhancer
+# version: 1.0
+# authors: Crius, Char, Drest, ilNibbio
+# url: https://github.com/netgamers-forum/discourse-category-mod-enhancer
 
-enabled_site_setting :plugin_name_enabled
+enabled_site_setting :category_mod_enhancer_enabled
 
 module ::MyPluginModule
     PLUGIN_NAME = "discourse-category-mod-enhancer"
