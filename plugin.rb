@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# name: discourse-category-mod-enhancer-v2
+# name: discourse-category-mod-enhancer
 # about: TODO
 # version: 0.0.1
 # authors: Daniele Mancini
@@ -10,7 +10,7 @@
 enabled_site_setting :plugin_name_enabled
 
 module ::MyPluginModule
-    PLUGIN_NAME = "discourse-category-mod-enhancer-v2"
+    PLUGIN_NAME = "discourse-category-mod-enhancer"
 end
 
 require_relative "lib/my_plugin_module/engine"
