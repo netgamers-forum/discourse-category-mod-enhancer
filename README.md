@@ -2,6 +2,10 @@
 
 This plugin is meant to allow Discourse Category Moderators to access advanced content management tools
 
+## More info
+
+Check on [meta.discourse.com](https://meta.discourse.org/t/category-mod-enhancer/268065)
+
 ## To contribute
 
 - Download a [development version of discourse](https://meta.discourse.org/t/install-discourse-for-development-using-docker/102009/90) and have it run in your local machine
@@ -11,6 +15,4 @@ This plugin is meant to allow Discourse Category Moderators to access advanced c
 - ???
 - Profit
 
-## Third party
 
-- https://github.com/discourse/discourse-groups-css-classes-in-body
