@@ -51,14 +51,14 @@ export default {
                 button_group: "time",
               })
             }
-            if (!decorator.attrs.actionButtons.find((b) => b.url === `/review?topic_id=${topic.id}&status=all`)) {
-              decorator.attrs.actionButtons.push({
-                icon: "list",
-                buttonClass: "popup-menu-btn",
-                fullLabel: "review.moderation_history",
-                url: `/review?topic_id=${topic.id}&status=all`,
-              })
-            }
+            // if (!decorator.attrs.actionButtons.find((b) => b.url === `/review?topic_id=${topic.id}&status=all`)) {
+            //   decorator.attrs.actionButtons.push({
+            //     icon: "list",
+            //     buttonClass: "popup-menu-btn",
+            //     fullLabel: "review.moderation_history",
+            //     url: `/review?topic_id=${topic.id}&status=all`,
+            //   })
+            // }
           }
         })
 
@@ -74,6 +74,7 @@ export default {
             };
           }
         })
+
         api.addPostAdminMenuButton((attrs) => {
           if(!(user.admin || user.moderator) && attrs.user_id){
             if(attrs.locked){
@@ -123,18 +124,18 @@ export default {
             };
           }
         })
-        api.addPostAdminMenuButton((attrs) => {
-          if(!(user.admin || user.moderator)){
-            return {
-              icon: "list",
-              className: "popup-menu-button moderation-history",
-              label: "review.moderation_history",
-              action: (post) => {
-                window.open(`/review?topic_id=${post.topic_id}&status=all`, '_blank');
-              },
-            }
-          }
-        })
+        // api.addPostAdminMenuButton((attrs) => {
+        //   if(!(user.admin || user.moderator)){
+        //     return {
+        //       icon: "list",
+        //       className: "popup-menu-button moderation-history",
+        //       label: "review.moderation_history",
+        //       action: (post) => {
+        //         window.open(`/review?topic_id=${post.topic_id}&status=all`, '_blank');
+        //       },
+        //     }
+        //   }
+        // })
 
         api.addPostAdminMenuButton((attrs) =>{
           if (!(user.admin || user.moderator) && !attrs.isWhisper){
