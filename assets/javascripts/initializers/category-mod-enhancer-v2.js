@@ -5,7 +5,7 @@ export default {
     withPluginApi("1.13.0", (api) => {
       const user = api.getCurrentUser()
       if(user) {
-        api.decorateWidget('topic-admin-menu-button:adminMenuButtons', (decorator) => {
+        api.decorateWidget('topic-admin-menu:adminMenuButtons', (decorator) => {
           const topic = decorator.attrs.topic
           const details = topic.get("details");
           const can_moderate_category = details.get("can_moderate_category")
