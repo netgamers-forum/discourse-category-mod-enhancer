@@ -28,7 +28,6 @@ after_initialize do
     end
 
     add_to_class(:post_guardian, :can_rebake?) do |post|
-        return false unless authenticated?
         is_staff? || @user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(post.topic)
     end
 
@@ -93,5 +92,13 @@ after_initialize do
 
             render body: nil
         end
+
+        def rebake
+            post = find_post_from_params
+            guardian.can_rebake?(post)
+            post.rebake!
+            render body: nil
+        end
+
     end
 end
