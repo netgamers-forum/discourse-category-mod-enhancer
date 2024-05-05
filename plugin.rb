@@ -43,6 +43,12 @@ after_initialize do
         false
     end
 
+    add_to_class(:post_guardian, :can_change_post_owner?) do |topic|
+        return true if is_admin?
+
+        (SiteSetting.moderators_change_post_ownership && is_staff?) || can_perform_action_available_to_group_moderators?(topic)
+    end
+
     class ::TopicsController < ApplicationController
         def reset_bump_date
             params.require(:id)
@@ -79,6 +85,28 @@ after_initialize do
                 render json: failed_json, status: 422
             end
         end
+
+        def change_post_owners
+            params.require(:post_ids)
+            params.require(:topic_id)
+            params.require(:username)
+
+            topic = Topic.find_by(id: params[:topic_id])
+            guardian.can_change_post_owner?(topic)
+
+            begin
+                PostOwnerChanger.new(
+                  post_ids: params[:post_ids].to_a,
+                  topic_id: params[:topic_id].to_i,
+                  new_owner: User.find_by(username: params[:username]),
+                  acting_user: current_user,
+                  ).change_owner!
+                render json: success_json
+            rescue ArgumentError
+                render json: failed_json, status: 422
+            end
+        end
+
     end
 
     class ::PostsController < ApplicationController

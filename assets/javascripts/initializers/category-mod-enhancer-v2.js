@@ -100,6 +100,23 @@ export default {
             }
           }
         })
+
+        api.addPostAdminMenuButton((attrs) => {
+          if (!(user.admin || user.moderator)){
+            return{
+              icon: "user",
+              className: "btn popup-menu-btn change-owner",
+              label:"post.controls.change_owner",
+              action: (post) => {
+                let topic = post.topic
+                let controller = getOwnerWithFallback(topic).lookup("controller:topic")
+                controller.set("selectedPostIds", [post.id]);
+                controller.send("changeOwner");
+              }
+            }
+          }
+        })
+
         api.addPostAdminMenuButton((attrs) => {
           if(!(user.admin || user.moderator) && attrs.hidden){
             return {
