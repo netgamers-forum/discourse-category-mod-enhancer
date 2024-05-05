@@ -7,7 +7,7 @@
 enabled_site_setting :category_mod_enhancer_enabled
 
 module ::MyPluginModule
-    PLUGIN_NAME = "discourse-category-mod-enhancer-v2"
+    PLUGIN_NAME = "discourse-category-mod-enhancer"
 end
 
 require_relative "lib/my_plugin_module/engine"
@@ -18,7 +18,7 @@ after_initialize do
         obj && authenticated? && !is_silenced? &&
           (
             is_staff? ||
-              (obj.is_a?(Topic) && (@user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(obj) ) && can_see_topic?(obj))
+              (obj.is_a?(Topic) && (@user.has_trust_level?(TrustLevel[4]) || can_perform_action_available_to_group_moderators?(obj)) && can_see_topic?(obj))
 
           )
     end
@@ -41,6 +41,12 @@ after_initialize do
         end
 
         false
+    end
+
+    add_to_class(:post_guardian, :can_change_post_owner?) do |topic|
+        return true if is_admin?
+
+        (SiteSetting.moderators_change_post_ownership && is_staff?) || can_perform_action_available_to_group_moderators?(topic)
     end
 
     class ::TopicsController < ApplicationController
@@ -79,6 +85,28 @@ after_initialize do
                 render json: failed_json, status: 422
             end
         end
+
+        def change_post_owners
+            params.require(:post_ids)
+            params.require(:topic_id)
+            params.require(:username)
+
+            topic = Topic.find_by(id: params[:topic_id])
+            guardian.can_change_post_owner?(topic)
+
+            begin
+                PostOwnerChanger.new(
+                  post_ids: params[:post_ids].to_a,
+                  topic_id: params[:topic_id].to_i,
+                  new_owner: User.find_by(username: params[:username]),
+                  acting_user: current_user,
+                  ).change_owner!
+                render json: success_json
+            rescue ArgumentError
+                render json: failed_json, status: 422
+            end
+        end
+
     end
 
     class ::PostsController < ApplicationController
@@ -92,5 +120,13 @@ after_initialize do
 
             render body: nil
         end
+
+        def rebake
+            post = find_post_from_params
+            guardian.can_rebake?(post)
+            post.rebake!
+            render body: nil
+        end
+
     end
 end
